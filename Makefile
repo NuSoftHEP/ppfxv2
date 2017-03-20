@@ -1,30 +1,32 @@
 
+prefix=$(PPFX_FQ_DIR)
 OBJS_LIB = $(shell ls src/*.cpp | sed 's/\.cpp/.o/')
 PROGS = $(shell ls src/*.C | sed 's/\.C//' | sed 's/src\///')
-INCLUDES = -I./include -I$(shell root-config --incdir) -I$(BOOSTROOT) -I${DK2NU_INC}
+INCLUDES = -I./include -I$(shell root-config --incdir) -I$(BOOST_INC) -I$(DK2NU_INC)
 DEPLIBS=$(shell root-config --libs) -lEG 
 
 CC	=	g++
-COPTS	=	-fPIC -DLINUX -O0  -g $(shell root-config --cflags) $(M32)
+COPTS	=	-fPIC -DLINUX -O0  -g $(shell root-config --cflags) 
 FLAGS   =       -g
 
-all:    lib programs doxy
+all:  mklibbin lib programs
 
 lib: libppfx.so 
 
-libppfx.so: $(OBJS_LIB)
-	if [ ! -d lib ]; then mkdir -p lib; fi
+mklibbin:
+	if [ ! -d $(prefix)/lib ]; then mkdir -p $(prefix)/lib; fi
+	if [ ! -d $(prefix)/bin ]; then mkdir -p $(prefix)/bin; fi
 
-	$(CC) -shared $(M32) -o lib/$@ $^ -L${DK2NU_LIB} -ldk2nuTree
+libppfx.so: $(OBJS_LIB)
+	$(CC) -shared -o $(prefix)/lib/$@ $^ -L$(DK2NU_LIB) -ldk2nuTree $(DEPLIBS)
 
 
 programs: $(PROGS)
 	echo making $(PROGS)
 
 $(PROGS): % : src/%.o $(OBJS_LIB)  libppfx.so
-	if [ ! -d bin ]; then mkdir -p bin; fi
-
-	$(CC) -Wall $(M32) -o bin/$@ $< $(PPFX_OBJS) $(DEPLIBS) -L$(PPFX_DIR)/lib -lppfx -L${DK2NU_LIB} -ldk2nuTree
+	$(CC) -Wall -o $(prefix)/bin/$@ $< $(PPFX_OBJS) $(DEPLIBS) \
+	      -L$(prefix)/lib -lppfx -L$(DK2NU_LIB) -ldk2nuTree
 
 
 %.o: %.cpp
@@ -46,10 +48,10 @@ delobj:
 	-rm src/*.o
 
 dellib:
-	if [ -d lib ]; then rm -rf lib; fi 		
+	if [ -d $(prefix)/lib ]; then rm -rf $(prefix)/lib; fi 		
 
 delbin:
-	if [ -d bin ]; then rm -rf bin; fi
+	if [ -d $(prefix)/bin ]; then rm -rf $(prefix)/bin; fi
 
 deldoxy:
 	if [ -d html ]; then rm -rf html; fi

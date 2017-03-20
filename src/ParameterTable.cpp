@@ -2,6 +2,8 @@
 #include "ParameterTable.h"
 #include "Exceptions.h"
 
+#include <algorithm>
+
 namespace NeutrinoFluxReweight{ 
   
   void ParameterTable::setParameter(Parameter p){
