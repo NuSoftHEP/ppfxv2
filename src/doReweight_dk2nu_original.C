@@ -14,9 +14,9 @@
 
 //Some constants::
 
-const int NbinsE   = 120;
+const int NbinsE   = 200;
 const double emin  =   0.;
-const double emax  = 120.;
+const double emax  = 20.;
 const int Nnuhel   = 4;
 const char* nuhel[Nnuhel] = {"numu","numubar","nue","nuebar"};
 const char* nulabel[Nnuhel] = {"#nu_{#mu}","#bar#nu_{#mu}","#nu_{e}","#bar#nu_{e}"};
@@ -124,7 +124,12 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
   if(doing_precalculated_pos){
     detname = (dkmeta->location)[idet].name;
   }
-  std::cout<<"=> Doing the analysis for: "<< detname <<std::endl; 
+  std::cout<<"=> Doing the analysis for: "<< detname <<std::endl;
+
+  std::cout<<"#POT = "<<dkmeta->pots<<std::endl;
+  TH1D hpot("hpot", "", 1, 0, 1);
+  hpot.SetYTitle("#POT");
+  hpot.SetBinContent(1, dkmeta->pots);
 
   std::vector<double> vwgt_mipp_pi;
   std::vector<double> vwgt_mipp_K;
@@ -143,7 +148,7 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
   double nuenergy = 0;
 
   for(int ii=0;ii<nentries;ii++){  
-    if(ii%1000==0)std::cout<<ii/1000<<" k evts"<<std::endl;
+    if(ii%1000==0)std::cout<<ii/1000<<" k / "<<nentries/1000<<" k evts"<<std::endl;
     vwgt_mipp_pi.clear();  
     vwgt_mipp_K.clear();  
     vwgt_abs.clear();  
@@ -226,6 +231,8 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
       fOut->cd(Form("%s_total"      ,nuhel[ii]));  htotal[ii][jj]->Write();      
     }
   }
+  fOut->cd();
+  hpot.Write();
   
   //Releasing memory:
   makerew->resetInstance();
@@ -269,6 +276,7 @@ int main(int argc, const char* argv[]){
     doReweight_dk2nu(argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]);
   }
   else{
+    std::cout<<"Error: Invalid number of arguments ("<<(argc-1)<<")"<<std::endl;
     usage();
     exit (1);
     }
