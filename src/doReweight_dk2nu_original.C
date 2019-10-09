@@ -69,6 +69,13 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
   TH1D* hothers[Nnuhel][Nuniverses];
   TH1D* htotal[Nnuhel][Nuniverses];
   
+  TH1D* hthin_pCpi[Nnuhel][Nuniverses];
+  TH1D* hthin_pCk[Nnuhel][Nuniverses];
+  TH1D* hthin_nCpi[Nnuhel][Nuniverses];
+  TH1D* hthin_pCnu[Nnuhel][Nuniverses];
+  TH1D* hthin_mesinc[Nnuhel][Nuniverses];
+  TH1D* hthin_nua[Nnuhel][Nuniverses];
+  
   for(int ii=0;ii<Nnuhel;ii++){
     const TString xtitle = "E_{#nu} [GeV]";
     const TString ytitle = "##nu_{unoscillated} [m^{-2}]";
@@ -101,6 +108,31 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
       htotal[ii][jj]  = new TH1D(Form("htotal_%s_%d", nuhel[ii],jj),Form("%s flux corrected for all effects, univ. #%i", nulabel[ii], jj),NbinsE,emin,emax);
       htotal[ii][jj]->SetXTitle(xtitle);
       htotal[ii][jj]->SetYTitle(ytitle);
+
+
+      hthin_pCpi[ii][jj]   = new TH1D(Form("hthin_pCpi_%s_%d",   nuhel[ii],jj),Form("%s flux corrected based on thin target p+C#rightarrow#pi+X data, univ. #%i", nulabel[ii], jj), NbinsE,emin,emax);
+      hthin_pCpi[ii][jj]->SetXTitle(xtitle);
+      hthin_pCpi[ii][jj]->SetYTitle(ytitle);
+
+      hthin_pCk[ii][jj]    = new TH1D(Form("hthin_pCk_%s_%d",    nuhel[ii],jj),Form("%s flux corrected based on thin target p+C#rightarrowK+X data, univ. #%i", nulabel[ii], jj), NbinsE,emin,emax);
+      hthin_pCk[ii][jj]->SetXTitle(xtitle);
+      hthin_pCk[ii][jj]->SetYTitle(ytitle);
+
+      hthin_nCpi[ii][jj]   = new TH1D(Form("hthin_nCpi_%s_%d",   nuhel[ii],jj),Form("%s flux corrected based on thin target n+C#rightarrow#pi+X data, univ. #%i", nulabel[ii], jj), NbinsE,emin,emax);
+      hthin_nCpi[ii][jj]->SetXTitle(xtitle);
+      hthin_nCpi[ii][jj]->SetYTitle(ytitle);
+
+      hthin_pCnu[ii][jj]   = new TH1D(Form("hthin_pCnu_%s_%d",   nuhel[ii],jj),Form("%s flux corrected based on thin target p+C#rightarrowN+X data, univ. #%i", nulabel[ii], jj), NbinsE,emin,emax);
+      hthin_pCnu[ii][jj]->SetXTitle(xtitle);
+      hthin_pCnu[ii][jj]->SetYTitle(ytitle);
+
+      hthin_mesinc[ii][jj] = new TH1D(Form("hthin_mesinc_%s_%d", nuhel[ii],jj),Form("%s flux corrected based on thin target data on meson interaction, univ. #%i", nulabel[ii], jj), NbinsE,emin,emax);
+      hthin_mesinc[ii][jj]->SetXTitle(xtitle);
+      hthin_mesinc[ii][jj]->SetYTitle(ytitle);
+
+      hthin_nua[ii][jj]    = new TH1D(Form("hthin_nua_%s_%d",    nuhel[ii],jj),Form("%s flux corrected based on thin target data on N+detector material, univ. #%i", nulabel[ii], jj), NbinsE,emin,emax);
+      hthin_nua[ii][jj]->SetXTitle(xtitle);
+      hthin_nua[ii][jj]->SetYTitle(ytitle);
     }
   }
   
@@ -204,6 +236,12 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
       hothers[nuidx][jj]->Fill(nuenergy,fluxWGT*vwgt_oth[jj]);
       htotal[nuidx][jj]->Fill(nuenergy,fluxWGT*wgt_thin*wgt_mipp*wgt_att*vwgt_oth[jj]);
 
+      hthin_pCpi  [nuidx][jj]->Fill(nuenergy, fluxWGT * vwgt_ttpCpi[jj]);
+      hthin_pCk   [nuidx][jj]->Fill(nuenergy, fluxWGT * vwgt_ttpCk[jj]);
+      hthin_nCpi  [nuidx][jj]->Fill(nuenergy, fluxWGT * vwgt_ttnCpi[jj]);
+      hthin_pCnu  [nuidx][jj]->Fill(nuenergy, fluxWGT * vwgt_ttpCnu[jj]);
+      hthin_mesinc[nuidx][jj]->Fill(nuenergy, fluxWGT * vwgt_ttmesinc[jj]);
+      hthin_nua   [nuidx][jj]->Fill(nuenergy, fluxWGT * vwgt_ttnua[jj]);
     }
   }
 
@@ -217,6 +255,13 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
     fOut->mkdir(Form("%s_attenuation",nuhel[ii]));
     fOut->mkdir(Form("%s_others",nuhel[ii]));
     fOut->mkdir(Form("%s_total",nuhel[ii]));
+
+    fOut->mkdir(Form("%s_thintarget/pCpi",nuhel[ii]));
+    fOut->mkdir(Form("%s_thintarget/pCk",nuhel[ii]));
+    fOut->mkdir(Form("%s_thintarget/nCpi",nuhel[ii]));
+    fOut->mkdir(Form("%s_thintarget/pCnu",nuhel[ii]));
+    fOut->mkdir(Form("%s_thintarget/mesinc",nuhel[ii]));
+    fOut->mkdir(Form("%s_thintarget/nua",nuhel[ii]));
   }
   
   for(int ii=0;ii<Nnuhel;ii++){
@@ -229,6 +274,13 @@ void doReweight_dk2nu(const char* inputFile, const char* outputFile, const char*
       fOut->cd(Form("%s_attenuation",nuhel[ii]));  hatt[ii][jj]->Write();
       fOut->cd(Form("%s_others"     ,nuhel[ii]));  hothers[ii][jj]->Write();
       fOut->cd(Form("%s_total"      ,nuhel[ii]));  htotal[ii][jj]->Write();      
+
+      fOut->cd(Form("%s_thintarget/pCpi"   , nuhel[ii])); hthin_pCpi  [ii][jj]->Write();
+      fOut->cd(Form("%s_thintarget/pCk"    , nuhel[ii])); hthin_pCk   [ii][jj]->Write();
+      fOut->cd(Form("%s_thintarget/nCpi"   , nuhel[ii])); hthin_nCpi  [ii][jj]->Write();
+      fOut->cd(Form("%s_thintarget/pCnu"   , nuhel[ii])); hthin_pCnu  [ii][jj]->Write();
+      fOut->cd(Form("%s_thintarget/mesinc" , nuhel[ii])); hthin_mesinc[ii][jj]->Write();
+      fOut->cd(Form("%s_thintarget/nua"    , nuhel[ii])); hthin_nua   [ii][jj]->Write();
     }
   }
   fOut->cd();
