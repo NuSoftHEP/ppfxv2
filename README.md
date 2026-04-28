@@ -8,6 +8,6 @@ git push nug --all
 git push nug --tags
 ```
 
-ppfx v3 and later is found at https://github.com/kordosky/ppfx
+ppfx v3 and later can be found at https://github.com/kordosky/ppfx
 
 This repository will be used to make any v2 releases.  It is also an archival repository.
