@@ -252,7 +252,7 @@ fwdir	product_dir	xml
 ####################################
 product		version		qual	flags		<table_format=2>
 dk2nudata	v01_11_00	-
-ifdh_art	v2_17_08	-
+ifdh_art	v2_17_09	-
 nufinder        v1_03_01       -
 cetmodules	v3_27_04	-	only_for_build
 end_product_list
